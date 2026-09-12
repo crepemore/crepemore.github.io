@@ -9,7 +9,8 @@ restaurant's own price list disagrees.
 Both languages ship in the markup. The header switch sets data-lang on <html>,
 and CSS decides which language is the heading and which is the small line under
 it, and flips the page between RTL and LTR. The choice is remembered per
-device, so a tablet stays on whatever was picked.
+device: the page opens in English, and switches to Arabic only if that device
+has chosen Arabic before.
 
 Output goes to site/ : index.html, img/, fonts/, logo.png
 """
@@ -156,11 +157,11 @@ def build_html(items):
                 f'<ul class="extras">{ex}</ul></section>')
 
     return f'''<!doctype html>
-<html lang="ar" dir="rtl" data-lang="ar">
+<html lang="en" dir="ltr" data-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>{E(TITLE_AR)}</title>
+<title>{E(TITLE_EN)}</title>
 <meta name="description" content="قائمة كريب أند مور - فرع الراشد مول. Crepe &amp; More menu, Al Rashid Mall.">
 <meta name="theme-color" content="{BLUE}">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -207,7 +208,7 @@ r.setAttribute('lang',l);r.setAttribute('dir',l==='ar'?'rtl':'ltr');}}}}catch(e)
   document.title=T[l];btn.setAttribute('aria-label',L[l]);
   try{{localStorage.setItem('menuLang',l)}}catch(e){{}}
  }}
- set(r.getAttribute('data-lang')||'ar');
+ set(r.getAttribute('data-lang')||'en');
  btn.addEventListener('click',function(){{
   set(r.getAttribute('data-lang')==='ar'?'en':'ar');
  }});
