@@ -52,6 +52,27 @@ GROUPS = [
 EXTRAS = [100, 99, 101, 102, 159, 178]
 GROUP_SKIP = {'FOOD'}          # the page opens on food, so it needs no label
 
+# Calories from the restaurant's own published list. Where an item is on the
+# menu but absent from that list, the API's own figure is used as a fallback
+# (see cal()); a few items have no figure anywhere and simply show none.
+CAL = {
+    117: 450, 1: 224, 93: 754, 2: 1150, 3: 420, 89: 380,
+    139: 450, 7: 560, 140: 450, 138: 560,
+    133: 240, 143: 520, 123: 180,
+    21: 4, 22: 4, 161: 5, 23: 70, 24: 70, 25: 80, 20: 4, 26: 60, 27: 20,
+    29: 180, 28: 200, 30: 140, 31: 260, 32: 180, 33: 50, 34: 50, 36: 5,
+    50: 5, 40: 150, 167: 5, 41: 320, 42: 250, 43: 250, 44: 250, 51: 150,
+    53: 465, 54: 550, 55: 450, 56: 470, 57: 420, 58: 410,
+    173: 220, 172: 200, 67: 210, 171: 190,
+    45: 300, 46: 350, 47: 350, 48: 375,
+    59: 80, 60: 40, 61: 120, 64: 150, 62: 200, 147: 160, 63: 40, 158: 200,
+    52: 150, 149: 140,
+    17: 400, 18: 450, 19: 450,
+    83: 300, 84: 400, 85: 400, 86: 500, 145: 150, 146: 200, 144: 350,
+    129: 470, 12: 520, 14: 380, 164: 450,
+}
+
+
 E = html.escape
 
 
@@ -65,6 +86,14 @@ def name_ar(i, items):
 
 def name_en(i, items):
     return build.EN.get(i, (items[i]['name_en'] or '').strip())
+
+
+def cal(i, items):
+    """Their list first, then the API's own figure; None if neither has one."""
+    if i in CAL:
+        return CAL[i]
+    v = items[i].get('calories')
+    return int(v) if v else None
 
 
 def price(i, items):
@@ -88,7 +117,17 @@ def cell(i, items):
             f'<p class="n ar" lang="ar" dir="rtl">{E(name_ar(i, items))}</p>'
             f'<p class="n en" lang="en" dir="ltr">{E(name_en(i, items))}</p>'
             f'<p class="price" dir="ltr">{price(i, items)}<span>SR</span></p>'
+            f'{kcal(i, items)}'
             f'</li>')
+
+
+def kcal(i, items):
+    c = cal(i, items)
+    if not c:
+        return ''
+    return (f'<p class="kcal" dir="ltr"><span>{c}</span>'
+            f'<em class="ar" lang="ar">سعرة</em>'
+            f'<em class="en" lang="en">kcal</em></p>')
 
 
 def shead(ar, en):
@@ -144,10 +183,10 @@ r.setAttribute('lang',l);r.setAttribute('dir',l==='ar'?'rtl':'ltr');}}}}catch(e)
   <img class="logo" src="logo.png" alt="Crepe &amp; More">
   <div class="where">{bi(BRANCH_AR, BRANCH_EN)}</div>
   <div class="hours">{bi(HOURS_AR, HOURS_EN)}</div>
-  <div class="langsw" role="group" aria-label="Language / اللغة">
-   <button type="button" data-set="ar" lang="ar">عربي</button>
-   <button type="button" data-set="en" lang="en">EN</button>
-  </div>
+  <button class="langsw" type="button">
+   <span class="ar" lang="ar" dir="rtl">عربي</span>
+   <span class="en" lang="en" dir="ltr">English</span>
+  </button>
  </div>
  <nav class="jump">{''.join(nav)}</nav>
 </header>
@@ -160,18 +199,17 @@ r.setAttribute('lang',l);r.setAttribute('dir',l==='ar'?'rtl':'ltr');}}}}catch(e)
 (function(){{
  var r=document.documentElement;
  var T={{ar:{json.dumps(TITLE_AR, ensure_ascii=False)},en:{json.dumps(TITLE_EN, ensure_ascii=False)}}};
- var btns=document.querySelectorAll('.langsw button');
+ var btn=document.querySelector('.langsw');
+ var L={{ar:'Switch to English',en:'التبديل إلى العربية'}};
  function set(l){{
   r.setAttribute('data-lang',l);r.setAttribute('lang',l);
   r.setAttribute('dir',l==='ar'?'rtl':'ltr');
-  document.title=T[l];
-  for(var i=0;i<btns.length;i++)
-   btns[i].setAttribute('aria-pressed',String(btns[i].getAttribute('data-set')===l));
+  document.title=T[l];btn.setAttribute('aria-label',L[l]);
   try{{localStorage.setItem('menuLang',l)}}catch(e){{}}
  }}
  set(r.getAttribute('data-lang')||'ar');
- document.querySelector('.langsw').addEventListener('click',function(e){{
-  var b=e.target.closest('button[data-set]');if(b)set(b.getAttribute('data-set'));
+ btn.addEventListener('click',function(){{
+  set(r.getAttribute('data-lang')==='ar'?'en':'ar');
  }});
 }})();
 </script>
@@ -206,11 +244,16 @@ body{{background:#fff;color:var(--ink);font-family:EM,PP,system-ui,sans-serif;
 .where,.hours{{display:flex;flex-direction:column;line-height:1.15}}
 
 /* ---- language switch ---- */
-.langsw{{flex:none;display:flex;gap:2px;padding:2px;background:#EEF3F9;border-radius:999px}}
-.langsw button{{font:700 clamp(11px,1.7vw,14px) EM;color:var(--blue);background:none;
- border:0;border-radius:999px;cursor:pointer;padding:7px clamp(9px,1.5vw,15px);
- min-height:34px;line-height:1;white-space:nowrap;-webkit-appearance:none}}
-.langsw button[aria-pressed=true]{{background:var(--blue);color:#fff}}
+.langsw{{flex:none;font-weight:700;font-size:clamp(11px,1.7vw,14px);color:#fff;
+ background:var(--blue);border:0;border-radius:999px;cursor:pointer;
+ padding:8px clamp(12px,1.9vw,18px);min-height:36px;line-height:1;
+ white-space:nowrap;-webkit-appearance:none}}
+.langsw:active{{opacity:.85}}
+.langsw .ar{{font-family:EM}}
+.langsw .en{{font-family:PP;letter-spacing:.03em}}
+/* show the language you would switch to, not the one you are on */
+[data-lang=ar] .langsw .ar{{display:none}}
+[data-lang=en] .langsw .en{{display:none}}
 
 /* ---- quick jump ---- */
 .jump{{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
@@ -245,6 +288,12 @@ section{{scroll-margin-top:clamp(96px,18vw,140px)}}
 .item .n{{line-height:1.25}}
 .item .price{{order:3;font:700 clamp(12px,1.9vw,17px) PP;color:var(--blue);margin-top:5px}}
 .item .price span{{font:700 .62em PP;margin-inline-start:2px;letter-spacing:.04em}}
+.item .kcal{{order:4;display:flex;justify-content:center;align-items:baseline;gap:3px;
+ margin-top:3px;font:500 clamp(8px,1.1vw,10.5px) PP;color:#A9B5C4}}
+.item .kcal em{{font-style:normal}}
+.item .kcal .ar{{font-family:EM;font-size:1.1em}}
+[data-lang=ar] .item .kcal .en{{display:none}}
+[data-lang=en] .item .kcal .ar{{display:none}}
 
 /* ---- extras ---- */
 .extras{{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;
