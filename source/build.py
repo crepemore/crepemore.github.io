@@ -104,12 +104,13 @@ def img_for(i):
 PRICE = {
     21: 10,    # Coffee of the Day      8 -> 10
     32: 19,    # Pistachio Latte       17 -> 19
+    34: 20,    # Saudi Coffee          10 -> 20
     59: 16,    # Orange Juice          12 -> 16
     61: 16,    # Fresh Apple Juice     14 -> 16
     93: 32,    # Dubai Crepe           28 -> 32
     123: 25,   # Waffle Balls          20 -> 25
     129: 15,   # Turkey & Cheese Club  14 -> 15
-    133: 28,   # Classic Waffle        22 -> 28  (not currently on the menu)
+    133: 28,   # Classic Waffle        22 -> 28
     139: 28,   # Mini Pancake          24 -> 28
     140: 28,   # Original Pancake      24 -> 28
 }
