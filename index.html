@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Crepe &amp; More · Al Rashid Mall — Menu</title>
 <meta name="description" content="قائمة كريب أند مور - فرع الراشد مول. Crepe &amp; More menu, Al Rashid Mall.">
-<meta name="theme-color" content="#2E5D95">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Crepe &amp; More">
@@ -27,7 +29,8 @@ r.setAttribute('lang',l);r.setAttribute('dir',l==='ar'?'rtl':'ltr');}}catch(e){}
 *{box-sizing:border-box;margin:0;padding:0}
 :root{color-scheme:light;--blue:#2E5D95;--ink:#1F3D63;--muted:#8D9CB0;--rule:#CBD6E5;
  --pad:clamp(12px,3vw,28px)}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html{color-scheme:light;background:#fff;scroll-behavior:smooth;
+ -webkit-text-size-adjust:100%}
 body{background:#fff;color:var(--ink);font-family:EM,PP,system-ui,sans-serif;
  -webkit-tap-highlight-color:transparent}
 
@@ -171,6 +174,28 @@ footer .sub{margin-top:4px}
 
 /* very narrow phones: the hours would crowd the switch out */
 @media (max-width:420px){.hours{display:none}}
+
+/* Some TV browsers (Android TV, Tizen, webOS) and phone "auto dark theme"
+   features repaint a light page dark. This is a white-branded menu whose
+   product photos are cut out onto white, so a dark ground breaks it. Re-assert
+   the light ground in every mode those features use. */
+@media (prefers-color-scheme:dark){
+ html,body{background:#fff;color:var(--ink)}
+ .top{background:#fff}
+ .langsw{background:var(--blue);color:#fff}
+ .jump a{background:#EEF3F9;color:var(--blue)}
+ .item .n.ar,.item .n.en{color:inherit}
+}
+@media (forced-colors:active){
+ html,body,.top,main,section,.item,.shot{forced-color-adjust:none;background:#fff}
+ body,.item .n{color:var(--ink)}
+ .jump a{forced-color-adjust:none;background:#EEF3F9;color:var(--blue)}
+ .langsw{forced-color-adjust:none;background:var(--blue);color:#fff}
+ .item .price,.extras .price,.st .ar,.st .en,.group .ar,.group .en{
+  forced-color-adjust:none;color:var(--blue)}
+ .item .kcal,.item .n.en{forced-color-adjust:none;color:#A9B5C4}
+ .shot img{forced-color-adjust:none}
+}
 </style>
 </head>
 <body>
