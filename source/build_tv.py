@@ -31,6 +31,13 @@ MAX_SECTIONS = 2         # per board, so a board never looks like a jumble
 DWELL_MS = 11000         # how long each board stays up
 EXTRAS = W.EXTRAS
 
+# Items kept on the tablet page but left off the wall screens, where space is
+# the scarce thing and these do not earn a slot.
+TV_HIDE = {
+    145,   # Vanilla Cookies   كوكيز الفانيليا
+    146,   # Chocolate Cookies كوكيز الشوكولاتة
+}
+
 E = html.escape
 
 PAGES = [
@@ -59,8 +66,12 @@ def rows_for(n):
 
 def sections_of(p):
     """This half of the menu, plus the extras strip on the drinks screen."""
-    out = [(a, e, list(ids)) for a, e, ids in W.GROUPS[p['group']][2]]
-    if p['extras']:
+    out = []
+    for a, e, ids in W.GROUPS[p['group']][2]:
+        keep = [i for i in ids if i not in TV_HIDE]
+        if keep:
+            out.append((a, e, keep))
+    if p['extras'] and EXTRAS:
         out.append(('إضافات', 'EXTRAS', list(EXTRAS)))
     return out
 
@@ -95,6 +106,18 @@ def boards(p):
             flush()
         cur.append((s_ar, s_en, ids)); used += r
     flush()
+
+    # A board holding one short section reads as a mistake on a wall screen -
+    # a lone scoop of gelato for eleven seconds. If the run ends that way, pull
+    # the previous board's last section down to keep it company.
+    while (len(out) >= 2 and len(out[-1]) == 1
+           and rows_for(len(out[-1][0][2])) == 1 and len(out[-2]) >= 2):
+        moved = out[-2][-1]
+        rows = rows_for(len(moved[2])) + sum(rows_for(len(i)) for _, _, i in out[-1])
+        if rows > MAX_ROWS or len(out[-1]) + 1 > MAX_SECTIONS:
+            break
+        out[-2].pop()
+        out[-1].insert(0, moved)
     return out
 
 

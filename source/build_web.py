@@ -44,13 +44,12 @@ GROUPS = [
                                           29, 28, 30, 32, 31, 33, 34, 36, 37]),
         ('مشروبات مثلجة', 'ICED DRINKS', [50, 40, 167, 41, 42, 43, 44, 49, 51]),
         ('فرابيه',        'FRAPPE',      [45, 46, 47, 48]),
+        ('موهيتو',        'MOJITO',      [173, 172, 67, 171]),
         ('ميلك شيك',      'MILKSHAKE',   [53, 54, 55, 56, 57, 58]),
         ('عصائر و سموثي', 'JUICE & SMOOTHIE', [59, 60, 61, 63, 64, 62, 176]),
-        ('موهيتو',        'MOJITO',      [173, 172, 67, 171]),
-        ('مشروبات باردة', 'COLD DRINKS', [52, 91]),
     ]),
 ]
-EXTRAS = [100, 99, 101, 102, 159, 178]
+EXTRAS = []          # the إضافات strip was dropped from the menu
 GROUP_SKIP = {'FOOD'}          # the page opens on food, so it needs no label
 
 # Calories from the restaurant's own published list. Where an item is on the
@@ -152,9 +151,10 @@ def build_html(items):
         f'<span class="en" lang="en" dir="ltr">{E(name_en(i, items))}</span>'
         f'<span class="price" dir="ltr">{price(i, items)}<span>SR</span></span></li>'
         for i in EXTRAS if i in items)
-    nav.append(f'<a href="#extras">{bi("إضافات", "EXTRAS")}</a>')
-    body.append(f'<section id="extras">{shead("إضافات", "EXTRAS")}'
-                f'<ul class="extras">{ex}</ul></section>')
+    if ex:
+        nav.append(f'<a href="#extras">{bi("إضافات", "EXTRAS")}</a>')
+        body.append(f'<section id="extras">{shead("إضافات", "EXTRAS")}'
+                    f'<ul class="extras">{ex}</ul></section>')
 
     return f'''<!doctype html>
 <html lang="en" dir="ltr" data-lang="en">
