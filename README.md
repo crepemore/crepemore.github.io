@@ -14,6 +14,20 @@ Single-page digital menu, built for viewing in a browser on an in-store tablet.
 - Fonts (El Messiri, Poppins) are self-hosted and subset to only the glyphs
   this page uses, so the page loads without any third-party requests.
 
+
+## Two screens, two pages
+
+- **Tablet / phone** — <https://crepemore.github.io/> — one scrolling page with
+  an Arabic/English switch. Opens in English.
+- **TV menu board** — <https://crepemore.github.io/tv/> — for a wall-mounted
+  screen. Nothing scrolls; it cycles through 12 boards, ~11s each (about a
+  2-minute loop), sized to be read from across the room. Both languages show at
+  once since there is nothing to tap. Arrow keys or a click step through it by
+  hand while you set the screen up.
+
+Both pages share the same photos, prices and calories, so a change flows to
+both. Regenerate with `python3 build_web.py` and `python3 build_tv.py`.
+
 ## Adding it to the tablet
 
 Open the link in Safari, then **Share → Add to Home Screen**. It opens
