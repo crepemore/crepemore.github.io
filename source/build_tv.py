@@ -51,13 +51,12 @@ PAGES = [
 def item(i, items):
     img = (f'<img src="../img/{i}.jpg" alt="">'
            if os.path.exists(f'site/img/{i}.jpg') else '')
-    c = W.cal(i, items)
-    kcal = f'<p class="k">{c}<span> kcal</span></p>' if c else '<p class="k"></p>'
+    # no calorie line here - it is on the tablet page, but at this distance the
+    # room is better spent on the photo
     return (f'<li><div class="sh">{img}</div>'
             f'<p class="a">{E(W.name_ar(i, items))}</p>'
             f'<p class="e">{E(W.name_en(i, items))}</p>'
-            f'<p class="p">{W.price(i, items)}<span>SR</span></p>'
-            f'{kcal}</li>')
+            f'<p class="p">{W.price(i, items)}<span>SR</span></p></li>')
 
 
 def rows_for(n):
@@ -266,13 +265,12 @@ section ul{{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;
  gap:26px 18px}}
 section li{{width:336px;display:flex;flex-direction:column;align-items:center;
  text-align:center}}
-.sh{{width:100%;height:204px;display:flex;align-items:flex-end;justify-content:center}}
+.sh{{width:100%;height:236px;display:flex;align-items:flex-end;justify-content:center}}
 .sh img{{max-width:100%;max-height:100%;object-fit:contain;display:block}}
 .a{{font:600 34px/1.2 EM;color:{INK};margin-top:12px}}
 .e{{direction:ltr;font:500 21px/1.25 PP;color:{MUTED};margin-top:3px}}
 .p{{direction:ltr;font:700 42px PP;color:{BLUE};margin-top:8px}}
 .p span{{font:700 .55em PP;margin-left:4px;letter-spacing:.04em}}
-.k{{direction:ltr;font:500 20px PP;color:#A9B5C4;margin-top:3px;min-height:24px}}
 
 /* extras strip */
 ul.x{{gap:20px 46px}}
