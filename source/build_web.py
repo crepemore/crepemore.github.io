@@ -424,8 +424,14 @@ def main():
     items = {x['id']: x for x in json.load(open('items-light.json'))['data']}
     ids = used_ids()
 
-    if os.path.isdir(OUT):
-        shutil.rmtree(OUT)
+    # Clear only what this script owns. The TV boards live in site/tv*/ and are
+    # built by build_tv.py - wiping the whole tree would delete them.
+    for p in (f'{OUT}/index.html', f'{OUT}/logo.png'):
+        if os.path.exists(p):
+            os.remove(p)
+    for d in (f'{OUT}/img', f'{OUT}/fonts'):
+        if os.path.isdir(d):
+            shutil.rmtree(d)
     os.makedirs(f'{OUT}/img', exist_ok=True)
     shutil.copy('logo_blue.png', f'{OUT}/logo.png')
 

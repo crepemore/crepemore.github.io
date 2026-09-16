@@ -156,10 +156,7 @@ def page(p, items):
 </head>
 <body>
 <div id="stage">
- <header>
-  <img src="../logo.png" alt="Crepe &amp; More">
-  <div class="s"><b>{p['ar']}</b><span>{p['en']}</span></div>
- </header>
+ <header><img src="../logo.png" alt="Crepe &amp; More"></header>
  <main>{panels}</main>
  <footer><div class="dots">{dots}</div>
   <p>الأسعار بالريال السعودي · Prices in Saudi Riyal</p></footer>
@@ -242,13 +239,10 @@ body{{background:#fff;color:{INK};font-family:EM,PP,sans-serif;overflow:hidden;
 #stage{{position:absolute;width:1920px;height:1080px;transform-origin:0 0;
  background:#fff;display:flex;flex-direction:column;padding:0 64px}}
 
-/* bare header: the logo, and which board this is. No rule underneath - the
-   menu starts straight after it. */
+/* bare header: just the logo. No board title, no rule underneath - each
+   section already names itself, and the room goes to the menu. */
 header{{flex:none;height:96px;display:flex;align-items:center;direction:ltr}}
 header img{{height:64px;width:auto}}
-header .s{{margin-left:auto;text-align:right;line-height:1.05}}
-header .s b{{display:block;font:700 44px EM;color:{BLUE}}}
-header .s span{{display:block;font:700 16px PP;letter-spacing:.3em;color:{MUTED}}}
 
 main{{flex:1;position:relative;min-height:0}}
 .board{{position:absolute;inset:0;display:flex;flex-direction:column;
@@ -262,10 +256,11 @@ main{{flex:1;position:relative;min-height:0}}
 .t i{{flex:1;height:2px;background:linear-gradient(to left,{BLUE},{RULE})}}
 
 section ul{{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;
- gap:26px 18px}}
-section li{{width:336px;display:flex;flex-direction:column;align-items:center;
+ gap:30px 34px}}
+section li{{width:320px;display:flex;flex-direction:column;align-items:center;
  text-align:center}}
-.sh{{width:100%;height:236px;display:flex;align-items:flex-end;justify-content:center}}
+/* the photo is inset inside its cell so two wide plates never crowd the gap */
+.sh{{width:90%;height:236px;display:flex;align-items:flex-end;justify-content:center}}
 .sh img{{max-width:100%;max-height:100%;object-fit:contain;display:block}}
 .a{{font:600 34px/1.2 EM;color:{INK};margin-top:12px}}
 .e{{direction:ltr;font:500 21px/1.25 PP;color:{MUTED};margin-top:3px}}
