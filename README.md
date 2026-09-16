@@ -15,18 +15,21 @@ Single-page digital menu, built for viewing in a browser on an in-store tablet.
   this page uses, so the page loads without any third-party requests.
 
 
-## Two screens, two pages
+## Three screens, three pages
 
 - **Tablet / phone** — <https://crepemore.github.io/> — one scrolling page with
   an Arabic/English switch. Opens in English.
-- **TV menu board** — <https://crepemore.github.io/tv/> — for a wall-mounted
-  screen. Nothing scrolls; it cycles through 12 boards, ~11s each (about a
-  2-minute loop), sized to be read from across the room. Both languages show at
-  once since there is nothing to tap. Arrow keys or a click step through it by
-  hand while you set the screen up.
+- **TV, food** — <https://crepemore.github.io/tv1/>
+- **TV, drinks** — <https://crepemore.github.io/tv2/>
 
-Both pages share the same photos, prices and calories, so a change flows to
-both. Regenerate with `python3 build_web.py` and `python3 build_tv.py`.
+The two TV boards are for wall-mounted screens. Nothing scrolls: each slides
+through its half of the menu, one board at a time, ~11s each. Both languages
+show at once since there is nothing to tap. Arrow keys or a click step through
+by hand while you set the screen up. <https://crepemore.github.io/tv/> just
+links to both.
+
+All three share the same photos, prices and calories, so a change flows
+everywhere. Regenerate with `python3 build_web.py` and `python3 build_tv.py`.
 
 ## Adding it to the tablet
 
