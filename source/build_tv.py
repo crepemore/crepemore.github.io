@@ -36,6 +36,7 @@ EXTRAS = W.EXTRAS
 TV_HIDE = {
     145,   # Vanilla Cookies   كوكيز الفانيليا
     146,   # Chocolate Cookies كوكيز الشوكولاتة
+    149,   # Gelato            آيس كريم جيلاتو - the whole Ice Cream section
 }
 
 E = html.escape
