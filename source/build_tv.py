@@ -64,6 +64,16 @@ def rows_for(n):
     return -(-n // PER_ROW)          # ceil
 
 
+def split_rows(n):
+    """Spread n items evenly over its rows instead of filling each to PER_ROW.
+
+    Six milkshakes packed greedily give 5 + 1, and the lone one on the second
+    row reads as a layout fault. Balanced, it is 3 + 3."""
+    r = rows_for(n)
+    base, extra = divmod(n, r)
+    return [base + 1] * extra + [base] * (r - extra)
+
+
 def sections_of(p):
     """This half of the menu, plus the extras strip on the drinks screen."""
     out = []
@@ -93,18 +103,19 @@ def boards(p):
         if s_en == 'EXTRAS':                       # one compact strip, one row
             if used + 1 > MAX_ROWS or len(cur) >= MAX_SECTIONS:
                 flush()
-            cur.append((s_ar, s_en, ids)); used += 1
+            cur.append((s_ar, s_en, ids, None)); used += 1
             continue
         if rows_for(len(ids)) > MAX_ROWS:           # needs boards of its own
             flush()
             per = MAX_ROWS * PER_ROW
-            for k in range(0, len(ids), per):
-                out.append([(s_ar, s_en, ids[k:k + per])])
+            chunks = [ids[k:k + per] for k in range(0, len(ids), per)]
+            for n, chunk in enumerate(chunks, 1):
+                out.append([(s_ar, s_en, chunk, (n, len(chunks)))])
             continue
         r = rows_for(len(ids))
         if used + r > MAX_ROWS or len(cur) >= MAX_SECTIONS:
             flush()
-        cur.append((s_ar, s_en, ids)); used += r
+        cur.append((s_ar, s_en, ids, None)); used += r
     flush()
 
     # A board holding one short section reads as a mistake on a wall screen -
@@ -113,7 +124,7 @@ def boards(p):
     while (len(out) >= 2 and len(out[-1]) == 1
            and rows_for(len(out[-1][0][2])) == 1 and len(out[-2]) >= 2):
         moved = out[-2][-1]
-        rows = rows_for(len(moved[2])) + sum(rows_for(len(i)) for _, _, i in out[-1])
+        rows = rows_for(len(moved[2])) + sum(rows_for(len(x[2])) for x in out[-1])
         if rows > MAX_ROWS or len(out[-1]) + 1 > MAX_SECTIONS:
             break
         out[-2].pop()
@@ -121,25 +132,23 @@ def boards(p):
     return out
 
 
-def section_html(s_ar, s_en, ids, items):
-    if s_en == 'EXTRAS':
-        body = ''.join(
-            f'<li><b>{E(W.name_ar(i, items))}</b>'
-            f'<em>{E(W.name_en(i, items))}</em>'
-            f'<span>{W.price(i, items)}<i>SR</i></span></li>'
-            for i in ids if i in items)
-        ul = f'<ul class="x">{body}</ul>'
-    else:
-        ul = f'<ul>{"".join(item(i, items) for i in ids)}</ul>'
+def section_html(s_ar, s_en, ids, part, items):
+    rows, at = '', 0
+    for n in split_rows(len(ids)):
+        rows += '<ul>' + ''.join(item(i, items) for i in ids[at:at + n]) + '</ul>'
+        at += n
+    # a section spread over several boards says so, or the repeated heading
+    # looks like the same screen shown twice
+    label = E(s_en) + (f' &middot; {part[0]}/{part[1]}' if part else '')
     return (f'<section><div class="t"><h2>{E(s_ar)}</h2>'
-            f'<span>{E(s_en)}</span><i></i></div>{ul}</section>')
+            f'<span>{label}</span><i></i></div>{rows}</section>')
 
 
 def page(p, items):
     bs = boards(p)
     panels = ''.join(
         f'<div class="board{" on" if n == 0 else ""}">'
-        + ''.join(section_html(a, e, ids, items) for a, e, ids in b)
+        + ''.join(section_html(a, e, ids, pt, items) for a, e, ids, pt in b)
         + '</div>' for n, b in enumerate(bs))
     dots = ''.join(f'<i{" class=on" if n == 0 else ""}></i>'
                    for n in range(len(bs)))
@@ -258,6 +267,7 @@ main{{flex:1;position:relative;min-height:0}}
 
 section ul{{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;
  gap:30px 34px}}
+section ul + ul{{margin-top:30px}}
 section li{{width:320px;display:flex;flex-direction:column;align-items:center;
  text-align:center}}
 /* the photo is inset inside its cell so two wide plates never crowd the gap */
@@ -293,13 +303,13 @@ def main():
         os.makedirs(d, exist_ok=True)
         open(f'{d}/index.html', 'w', encoding='utf-8').write(page(p, items))
         bs = boards(p)
-        n = sum(len(ids) for b in bs for _, _, ids in b)
+        n = sum(len(x[2]) for b in bs for x in b)
         print(f"{p['dir']}/  {p['en']:<7} {len(bs)} boards, {n} items, "
               f"{len(bs)*DWELL_MS/1000:.0f}s loop "
               f"({os.path.getsize(f'{d}/index.html')//1024}KB)")
         for k, b in enumerate(bs, 1):
             print(f"      board {k}: "
-                  + ' + '.join(f'{e}({len(i)})' for _, e, i in b))
+                  + ' + '.join(f'{x[1]}({len(x[2])})' for x in b))
 
     os.makedirs('site/tv', exist_ok=True)
     open('site/tv/index.html', 'w', encoding='utf-8').write(CHOOSER)
