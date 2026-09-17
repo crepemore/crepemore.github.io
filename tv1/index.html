@@ -66,6 +66,22 @@ footer p{font:600 19px EM;color:#8D9CB0;direction:rtl}
 .dots i{width:11px;height:11px;border-radius:50%;background:#CBD6E5;
  transition:background .3s,width .3s}
 .dots i.on{background:#2E5D95;width:30px;border-radius:6px}
+
+/* TV browsers (Android TV, Tizen, webOS) repaint light pages dark. The product
+   photos are cut out onto white, so a dark ground breaks them outright.
+   Re-assert the light ground in both modes those features use. */
+@media (prefers-color-scheme:dark){
+ html,body,#stage{background:#fff;color:#1F3D63}
+ .a{color:#1F3D63} .t h2,.p{color:#2E5D95} .t span,.e{color:#8D9CB0}
+ footer p{color:#8D9CB0} .dots i{background:#CBD6E5} .dots i.on{background:#2E5D95}
+}
+@media (forced-colors:active){
+ html,body,#stage,main,.board,section,li,.sh{forced-color-adjust:none;background:#fff}
+ .a{forced-color-adjust:none;color:#1F3D63}
+ .t h2,.p{forced-color-adjust:none;color:#2E5D95}
+ .t span,.e,footer p{forced-color-adjust:none;color:#8D9CB0}
+ .sh img{forced-color-adjust:none}
+}
 </style>
 </head>
 <body>
