@@ -246,8 +246,14 @@ html{{color-scheme:light;background:#fff}}
 body{{background:#fff;color:{INK};font-family:EM,PP,sans-serif;overflow:hidden;
  width:100vw;height:100vh}}
 
+
+/* Last resort against a TV browser that force-darkens the page. Auto-dark
+   engines invert background-COLOR but leave background-IMAGE alone, so a flat
+   white gradient survives where a plain white fill does not. */
+html,body{{background-color:#fff;background-image:linear-gradient(#fff,#fff)}}
+
 #stage{{position:absolute;width:1920px;height:1080px;transform-origin:0 0;
- background:#fff;display:flex;flex-direction:column;padding:0 64px}}
+ background-color:#fff;background-image:linear-gradient(#fff,#fff);display:flex;flex-direction:column;padding:0 64px}}
 
 /* bare header: just the logo. No board title, no rule underneath - each
    section already names itself, and the room goes to the menu. */
@@ -298,12 +304,12 @@ footer p{{font:600 19px EM;color:{MUTED};direction:rtl}}
    photos are cut out onto white, so a dark ground breaks them outright.
    Re-assert the light ground in both modes those features use. */
 @media (prefers-color-scheme:dark){{
- html,body,#stage{{background:#fff;color:{INK}}}
+ html,body,#stage{{background-color:#fff;background-image:linear-gradient(#fff,#fff);color:{INK}}}
  .a{{color:{INK}}} .t h2,.p{{color:{BLUE}}} .t span,.e{{color:{MUTED}}}
  footer p{{color:{MUTED}}} .dots i{{background:{RULE}}} .dots i.on{{background:{BLUE}}}
 }}
 @media (forced-colors:active){{
- html,body,#stage,main,.board,section,li,.sh{{forced-color-adjust:none;background:#fff}}
+ html,body,#stage,main,.board,section,li,.sh{{forced-color-adjust:none;background-color:#fff;background-image:linear-gradient(#fff,#fff)}}
  .a{{forced-color-adjust:none;color:{INK}}}
  .t h2,.p{{forced-color-adjust:none;color:{BLUE}}}
  .t span,.e,footer p{{forced-color-adjust:none;color:{MUTED}}}

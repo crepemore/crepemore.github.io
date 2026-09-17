@@ -31,11 +31,16 @@ r.setAttribute('lang',l);r.setAttribute('dir',l==='ar'?'rtl':'ltr');}}catch(e){}
  --pad:clamp(12px,3vw,28px)}
 html{color-scheme:light;background:#fff;scroll-behavior:smooth;
  -webkit-text-size-adjust:100%}
+
+/* Last resort against a TV browser that force-darkens the page. Auto-dark
+   engines invert background-COLOR but leave background-IMAGE alone, so a flat
+   white gradient survives where a plain white fill does not. */
+html,body{background-color:#fff;background-image:linear-gradient(#fff,#fff)}
 body{background:#fff;color:var(--ink);font-family:EM,PP,system-ui,sans-serif;
  -webkit-tap-highlight-color:transparent}
 
 /* ---- header ---- */
-.top{position:sticky;top:0;z-index:10;background:#fff;
+.top{position:sticky;top:0;z-index:10;background-color:#fff;background-image:linear-gradient(#fff,#fff);
  border-bottom:1px solid var(--rule);padding-top:env(safe-area-inset-top)}
 /* the brand bar keeps a fixed layout in both languages: logo left, switch
    right. Only the text inside it swaps language. */
@@ -180,14 +185,14 @@ footer .sub{margin-top:4px}
    product photos are cut out onto white, so a dark ground breaks it. Re-assert
    the light ground in every mode those features use. */
 @media (prefers-color-scheme:dark){
- html,body{background:#fff;color:var(--ink)}
- .top{background:#fff}
+ html,body{background-color:#fff;background-image:linear-gradient(#fff,#fff);color:var(--ink)}
+ .top{background-color:#fff;background-image:linear-gradient(#fff,#fff)}
  .langsw{background:var(--blue);color:#fff}
  .jump a{background:#EEF3F9;color:var(--blue)}
  .item .n.ar,.item .n.en{color:inherit}
 }
 @media (forced-colors:active){
- html,body,.top,main,section,.item,.shot{forced-color-adjust:none;background:#fff}
+ html,body,.top,main,section,.item,.shot{forced-color-adjust:none;background-color:#fff;background-image:linear-gradient(#fff,#fff)}
  body,.item .n{color:var(--ink)}
  .jump a{forced-color-adjust:none;background:#EEF3F9;color:var(--blue)}
  .langsw{forced-color-adjust:none;background:var(--blue);color:#fff}
