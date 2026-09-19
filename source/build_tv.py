@@ -43,10 +43,18 @@ E = html.escape
 
 PAGES = [
     dict(dir='tv1', ar='الطعام', en='FOOD',
-         title='Crepe & More — Food board', group=0, extras=False),
+         title='Crepe & More — Food board', group=0, extras=False,
+         promo='food.jpg'),
     dict(dir='tv2', ar='المشروبات', en='DRINKS',
-         title='Crepe & More — Drinks board', group=1, extras=True),
+         title='Crepe & More — Drinks board', group=1, extras=True,
+         promo='drinks.jpg'),
 ]
+
+# A promo slide shows edge to edge - no logo, no heading, no footer, just the
+# artwork - and only if the file is actually present, so a missing file means
+# no promo slide rather than a broken screen.
+PROMO_DIR = 'site/promo'
+PROMO_FIT = 'cover'      # 'cover' fills the screen, 'contain' shows it whole
 
 
 def item(i, items):
@@ -147,11 +155,17 @@ def section_html(s_ar, s_en, ids, part, items):
 def page(p, items):
     bs = boards(p)
     panels = ''.join(
-        f'<div class="board{" on" if n == 0 else ""}">'
+        f'<div class="slide board{" on" if n == 0 else ""}">'
         + ''.join(section_html(a, e, ids, pt, items) for a, e, ids, pt in b)
         + '</div>' for n, b in enumerate(bs))
+
+    promo, n_slides = '', len(bs)
+    if p.get('promo') and os.path.exists(f"{PROMO_DIR}/{p['promo']}"):
+        promo = (f'<div class="slide promo">'
+                 f'<img src="../promo/{p["promo"]}" alt=""></div>')
+        n_slides += 1
     dots = ''.join(f'<i{" class=on" if n == 0 else ""}></i>'
-                   for n in range(len(bs)))
+                   for n in range(n_slides))
     return f'''<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -170,6 +184,7 @@ def page(p, items):
  <main>{panels}</main>
  <footer><div class="dots">{dots}</div>
   <p>الأسعار بالريال السعودي · Prices in Saudi Riyal</p></footer>
+ {promo}
 </div>
 <script>
 (function(){{
@@ -182,12 +197,14 @@ def page(p, items):
  }}
  addEventListener('resize',fit); fit();
 
- var boards=document.querySelectorAll('.board'),
+ var slides=document.querySelectorAll('.slide'),
      dots=document.querySelectorAll('.dots i'), at=0, timer;
+ function base(el){{ return el.className.replace(/ ?on$/,''); }}
  function show(n){{
-  boards[at].className='board'; dots[at].className='';
-  at=(n+boards.length)%boards.length;
-  boards[at].className='board on'; dots[at].className='on';
+  slides[at].className=base(slides[at]); if(dots[at]) dots[at].className='';
+  at=(n+slides.length)%slides.length;
+  slides[at].className=base(slides[at])+' on';
+  if(dots[at]) dots[at].className='on';
  }}
  function next(){{ show(at+1); }}
  function go(n){{ show(n); clearInterval(timer); timer=setInterval(next,{DWELL_MS}); }}
@@ -261,10 +278,14 @@ header{{flex:none;height:96px;display:flex;align-items:center;direction:ltr}}
 header img{{height:64px;width:auto}}
 
 main{{flex:1;position:relative;min-height:0}}
+.slide{{opacity:0;visibility:hidden;transition:opacity .5s ease}}
+.slide.on{{opacity:1;visibility:visible}}
 .board{{position:absolute;inset:0;display:flex;flex-direction:column;
- justify-content:center;gap:18px;opacity:0;visibility:hidden;
- transition:opacity .5s ease}}
-.board.on{{opacity:1;visibility:visible}}
+ justify-content:center;gap:18px}}
+
+/* promo artwork: edge to edge over everything else on the stage */
+.promo{{position:absolute;inset:0;z-index:5;background:#fff}}
+.promo img{{width:100%;height:100%;object-fit:{PROMO_FIT};display:block}}
 
 .t{{display:flex;align-items:baseline;gap:18px;margin:0 0 10px}}
 .t h2{{font:700 42px/1.1 EM;color:{BLUE};white-space:nowrap}}
