@@ -57,6 +57,62 @@ PROMO_DIR = 'site/promo'
 PROMO_FIT = 'cover'      # 'cover' fills the screen, 'contain' shows it whole
 
 
+# Kept as a plain string, not part of an f-string, so its braces need no
+# escaping. Interpolated into each page's markup as {AUTO_RELOAD_JS}.
+AUTO_RELOAD_JS = """
+<script>
+/* Pick up published edits without anyone touching the screen.
+
+   A blind hourly location.reload() would blink the screen every hour even when
+   nothing had changed. So: fetch our own page, hash it, and only act when the
+   hash actually moves - which is almost never. When it does, fade a white veil
+   in first, so what you see is a soft fade rather than a page reloading. The
+   ground is already white, so the incoming page paints into the same colour. */
+(function(){
+ var EVERY = 3600000;            // check once an hour
+ var IDLE_BEFORE_RELOAD = 0; // ms of no interaction required (0 = never wait)
+ var mark = null, lastTouch = Date.now();
+
+ if (IDLE_BEFORE_RELOAD) {
+  ['pointerdown','touchstart','keydown','scroll','wheel'].forEach(function(e){
+   addEventListener(e, function(){ lastTouch = Date.now(); }, {passive:true});
+  });
+ }
+
+ function hash(t){ var h=0,i=0; for(;i<t.length;i++){ h=(h*31+t.charCodeAt(i))|0; } return h; }
+
+ function veilThenReload(){
+  var v = document.createElement('div');
+  v.style.cssText = 'position:fixed;inset:0;background:#fff;opacity:0;z-index:999;'
+                  + 'transition:opacity .45s ease;pointer-events:none';
+  document.body.appendChild(v);
+  requestAnimationFrame(function(){ v.style.opacity = '1'; });
+  setTimeout(function(){
+   location.replace(location.pathname + '?v=' + Date.now());
+  }, 520);
+ }
+
+ function check(){
+  fetch(location.pathname + '?probe=' + Date.now(), {cache:'no-store'})
+   .then(function(r){ return r.ok ? r.text() : null; })
+   .then(function(t){
+    if (t === null) return;               // offline or hiccup - try again later
+    var h = hash(t);
+    if (mark === null) { mark = h; return; }
+    if (h === mark) return;               // nothing published; no flicker
+    if (IDLE_BEFORE_RELOAD && Date.now() - lastTouch < IDLE_BEFORE_RELOAD) return;
+    veilThenReload();
+   })
+   .catch(function(){});                  // never let a failed probe break the page
+ }
+
+ check();                                 // baseline for this load
+ setInterval(check, EVERY);
+})();
+</script>
+"""
+
+
 def item(i, items):
     img = (f'<img src="../img/{i}.jpg" alt="">'
            if os.path.exists(f'site/img/{i}.jpg') else '')
@@ -186,6 +242,7 @@ def page(p, items):
   <p>الأسعار بالريال السعودي · Prices in Saudi Riyal</p></footer>
  {promo}
 </div>
+{AUTO_RELOAD_JS}
 <script>
 (function(){{
  var stage=document.getElementById('stage');
