@@ -105,6 +105,7 @@ PRICE = {
     21: 10,    # Coffee of the Day      8 -> 10
     32: 19,    # Pistachio Latte       17 -> 19
     34: 20,    # Saudi Coffee          10 -> 20
+    36: 10,    # Tea                    8 -> 10
     59: 16,    # Orange Juice          12 -> 16
     61: 16,    # Fresh Apple Juice     14 -> 16
     93: 32,    # Dubai Crepe           28 -> 32
